@@ -16,8 +16,8 @@ namespace fun {
 //------------------------------------------------------------------------------
 template <class T, class E> class Result;
 
-template <class T> struct MakeOkResult{ T val; };
-template <class E> struct MakeErrResult{ E val; };
+template <class T> struct MakeOkResult{ Sized<T> val; };
+template <class E> struct MakeErrResult{ Sized<E> val; };
 
 template <class T>
 auto ok(T val) -> MakeOkResult<T>;
@@ -128,8 +128,10 @@ public:
 
   auto as_ptr() -> value_t*;
   auto as_ptr() const -> const value_t*;
+  auto as_const_ptr() const -> const value_t* { return as_ptr(); }
   auto as_err_ptr() -> error_t*;
   auto as_err_ptr() const -> const error_t*;
+  auto as_const_err_ptr() const -> const error_t* { return as_err_ptr(); }
 
   bool operator==(const self_t& other) const;
   bool operator!=(const self_t& other) const;
@@ -152,6 +154,10 @@ public:
 
   template <class F>
   auto unwrap_or_else(F alt_func) && -> T;
+
+  auto unwrap_or_default() && -> T {
+    return std::move(*this).unwrap_or_else([](auto&&) -> T { return {}; });
+  }
 
   auto unwrap_err() && -> E;
 
@@ -189,7 +195,7 @@ public:
   auto and_then(F func) && -> AndThenReturn<F>;
 
   template <class F>
-  using OrElseReturn = Result<T, typename ResultOf_t<F(T)>::error_t>;
+  using OrElseReturn = Result<T, typename ResultOf_t<F(E)>::error_t>;
 
   template <typename F>
   auto or_else(F alt_func) && -> OrElseReturn<F>;

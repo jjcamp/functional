@@ -28,13 +28,13 @@ auto ok(T val) -> Result<T, E> {
 //------------------------------------------------------------------------------
 template <class T>
 auto ok_cref(const T& val) -> MakeOkResult<const T&> {
-  return { val };
+  return { Sized<const T&>(val) };
 }
 
 //------------------------------------------------------------------------------
 template <class T>
 auto ok_ref(T& val) -> MakeOkResult<T&> {
-  return { val };
+  return { Sized<T&>(val) };
 }
 
 //------------------------------------------------------------------------------
@@ -58,13 +58,13 @@ auto err(E val) -> Result<T, E> {
 //------------------------------------------------------------------------------
 template <class E>
 auto err_cref(const E& val) -> MakeErrResult<const E&> {
-  return { val };
+  return { Sized<const E&>(val) };
 }
 
 //------------------------------------------------------------------------------
 template <class E>
 auto err_ref(E& val) -> MakeErrResult<E&> {
-  return { val };
+  return { Sized<E&>(val) };
 }
 
 //------------------------------------------------------------------------------

@@ -206,6 +206,17 @@ public:
   template <typename F /* () -> Option<T> */>
   Option<T> or_else(F alt_func) &&;
 
+  template <class F /* const T& -> bool */>
+  auto filter(F&& predicate) && -> Option<T>
+  {
+    return std::move(*this).and_then(
+      [&](auto&& obj) -> Option<T> {
+        if (predicate(obj)) { return fun::Option<T>(std::forward<decltype(obj)>(obj)); }
+        else                { return {}; }
+      }
+    );
+  }
+
   Option<T> take();
 
   auto push(T obj) -> self_t&;
@@ -234,6 +245,10 @@ public:
 
   template <class F>
   T unwrap_or_else(F alt_func) &&;
+
+  auto unwrap_or_default() && -> T {
+    return std::move(*this).unwrap_or_else([]() -> T { return {}; });
+  }
 
   // Iterators
   //----------
